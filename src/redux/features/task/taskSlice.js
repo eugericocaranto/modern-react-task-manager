@@ -19,7 +19,7 @@ const saveTasksToLocalStorage = (tasks) => {
 }
 
 const taskSlice = createSlice({
-  name: 'task',
+  name: 'tasks',
   initialState: {
     tasks: loadTasksFromLocalStorage(),
     filter: {
