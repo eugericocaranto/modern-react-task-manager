@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { toggleComplete } from '../redux/features/task/taskSlice'
+import { deleteTask, toggleComplete } from '../redux/features/task/taskSlice'
 
 const TaskList = () => {
   const {tasks, filter} = useSelector((state) => state.tasks)
@@ -8,7 +8,24 @@ const TaskList = () => {
   const dispatch = useDispatch()
   const [editId, setEditId] = useState(null)
   const [editText, setEditText] = useState('')
-  console.log(tasks, filter)
+
+  const handleEdit = (id, text) => {
+    setEditId(id)
+    setEditText(text)
+  }
+
+  const handleEditSave = (task) => {
+    if (editText.trim() === '') return
+
+    dispatch({
+      type: 'tasks/updateTask',
+      payload: { id: task.id, text: editText.trim(), completed: task.completed }
+    })
+
+    setEditId(null)
+    setEditText('')
+  }
+
   return (
     <div>
       <ul className='space-y-2'>
@@ -21,9 +38,22 @@ const TaskList = () => {
                 className='border rounded px-2'/>
                 {
                   editId === task.id ? 
-                  (<input type="text" value={editText} onChange={(e) => setEditText(e.target.value)} />) :
+                  (<input className='border rounded px-2' type="text" value={editText} onChange={(e) => setEditText(e.target.value)} />) :
                   (<span className={task.completed ? 'line-through text-gray-500' : ''}>{task.text}</span>)
                 }
+              </div>
+
+              <div className='flex gap-2'>
+                {
+                  editId === task.id ? 
+                  (<button onClick={() => handleEditSave(task)}
+                    className='text-grey-600 hover:underline cursor-pointer'>Save</button>) :
+                  (<button onClick={() => handleEdit(task.id, task.text)}
+                    className='text-blue-600 hover:underline cursor-pointer'>Edit</button>)
+                }
+
+                <button onClick={() => dispatch(deleteTask(task.id))}
+                  className='text-red-500 hover:underline cursor-pointer'>Delete</button>
               </div>
             </li>
           ))
